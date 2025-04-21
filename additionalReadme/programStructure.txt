@@ -1,0 +1,19 @@
+pulsecheck/
+│
+├── app/                     # Core logic
+│   ├── nlp_pipeline.py      # Sentiment, theme, provider detection
+│   ├── feedback_handler.py  # Intake, routing, attribution logic
+│   └── storage.py           # Save to JSON or SQLite
+│
+├── data/
+│   ├── encounters.json      # Simulated patient encounters
+│   └── themes.json          # Theme keyword maps (for MVP)
+│
+├── dashboard/
+│   └── main.py              # Real-time feedback viewer (CLI/Streamlit/etc.)
+│
+├── tests/
+│   └── test_pipeline.py     # Test NLP accuracy and attribution
+│
+├── README.md
+└── requirements.txt

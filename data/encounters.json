@@ -1,0 +1,70 @@
+[
+    {
+        "encounter_id": "E001",
+        "patient_name": "John Doe",
+        "unit": "Orthopedic Surgery",
+        "discharge_date": "2025-04-16",
+        "providers": [
+            {
+                "id": "doc001",
+                "name": "Dr. Smith",
+                "role": "surgeon"
+            },
+            {
+                "id": "doc002",
+                "name": "Dr. Reyes",
+                "role": "anesthesiologist"
+            }
+        ]
+    },
+    {
+        "encounter_id": "E002",
+        "patient_name": "Jane Roe",
+        "unit": "Cardiology",
+        "discharge_date": "2025-04-15",
+        "providers": [
+            {
+                "id": "doc003",
+                "name": "Dr. Patel",
+                "role": "cardiologist"
+            }
+        ]
+    },
+    {
+        "encounter_id": "E003",
+        "patient_name": "Sam Lee",
+        "unit": "Emergency Department",
+        "discharge_date": "2025-04-17",
+        "providers": [
+            {
+                "id": "doc004",
+                "name": "Dr. Nguyen",
+                "role": "emergency physician"
+            },
+            {
+                "id": "doc005",
+                "name": "Dr. Johnson",
+                "role": "hospitalist"
+            }
+        ],
+        "feedback": "I had a greate time, party, party, party"
+    },
+    {
+        "encounter_id": "E004",
+        "patient_name": "Alex Kim",
+        "unit": "Gastroenterology",
+        "discharge_date": "2025-04-14",
+        "providers": [
+            {
+                "id": "doc006",
+                "name": "Dr. Santos",
+                "role": "gastroenterologist"
+            },
+            {
+                "id": "doc007",
+                "name": "Dr. Owens",
+                "role": "anesthesiologist"
+            }
+        ]
+    }
+]
