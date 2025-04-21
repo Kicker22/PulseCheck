@@ -1,48 +1,49 @@
-import json
+# Import necessary modules and functions from the app package
+import sys
+import os
 
+from app.storage import load_encounters
+from app.feedback_handler import handle_feedback
+#Function to display the encounters and ask for feedback using
+def display_encounters(encounters):
+
+    print("--------------------------------------------------")
+    print(r"""
+    ______      _          _____ _               _
+    | ___ \    | |        /  __ \ |             | |   
+    | |_/ /   _| |___  ___| /  \/ |__   ___  ___| | __
+    |  __/ | | | / __|/ _ \ |   | '_ \ / _ \/ __| |/ /
+    | |  | |_| | \__ \  __/ \__/\ | | |  __/ (__|   < 
+    \_|   \__,_|_|___/\___|\____/_| |_|\___|\___|_|\_\
+                                                  
+                                                """)
     
-def collect_feedback_from_encounter():
-    
-    with open('../data/encounters.json', 'r') as f:
-     encounter = json.load(f)
-     print(f"Loaded {len(encounter)} encounters.")
+    print("--------------------------------------------------")
+    print("\nAvailable Encounters:")
+    print("--------------------------------------------------")
 
+    # Loop through the encounters and print their details
+    for e in encounters:
+        providers = ", ".join(p['name'] for p in e.get('providers', []))
+        print(f"Encounter ID: {e['encounter_id']} | Patient: {e['patient_name']} | Unit: {e['unit']} | Providers: {providers}")
 
+#Main function starts the program and handles user input
+def main():
+    encounters = load_encounters()
+    if not encounters:
+        print("No encounters found.")
+        return
+    display_encounters(encounters)
 
-    for e in encounter:
-        provider_names = [p['name'] for p in e['providers']]
-        print(f"Encounter ID: {e['encounter_id']} | Patient: {e['patient_name']} | Unit: {e['unit']} | Providers: " + ", ".join(provider_names))
+    encounter_id = input("\nEnter the Encounter ID you would like to provide feedback for: ").strip().upper()
+    feedback_text = input("Please provide your feedback: ").strip()
 
-   
-    ptInput = input("Please enter the encounter ID you would like to provide feedback for: ")
-    # Check if input exists in the encounters
-    encounter_found = False
-    selected_encounter = None
-    for e in encounter:
-        if e['encounter_id'] == ptInput:
-            encounter_found = True
-            # Print the details of the selected encounter
-            selected_encounter = e
-            provider_names = [p['name'] for p in selected_encounter['providers']]
-            # print(f"You have selected Encounter: {selected_encounter['encounter_id']} | Patient: {selected_encounter['patient_name']} | Unit: {selected_encounter['unit']} | Providers: " + ", ".join(provider_names))
-            # ask for feedback for selected encounter.
-            feedback = input("Please provide your feedback for this encounter: ")
-            # Save feedback to the encounter
-            selected_encounter['feedback'] = feedback
-            # Save the updated encounters back to the file
-            with open('../data/encounters.json', 'w') as f:
-                json.dump(encounter, f, indent=4)
-            print("Feedback saved successfully.")
+    try:
+        feedback_entry = handle_feedback(encounter_id, feedback_text)
+        print(feedback_entry)
+    except ValueError as e:
+        print(f"Error: {e}")
 
-            return {
-                "encounter_id": selected_encounter['encounter_id'],
-                "patient_name": selected_encounter['patient_name'],
-                "unit": selected_encounter['unit'],
-                "providers": provider_names,
-                "feedback": feedback
-            }
-    if not encounter_found:
-        print("Encounter ID not found, Please try again.")
-        return collect_feedback_from_encounter()
-collect_feedback_from_encounter()
+if __name__ == "__main__":
+    main()
 

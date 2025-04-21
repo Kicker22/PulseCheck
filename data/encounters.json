@@ -15,7 +15,8 @@
                 "name": "Dr. Reyes",
                 "role": "anesthesiologist"
             }
-        ]
+        ],
+        "feedback": []
     },
     {
         "encounter_id": "E002",
@@ -27,6 +28,35 @@
                 "id": "doc003",
                 "name": "Dr. Patel",
                 "role": "cardiologist"
+            }
+        ],
+        "feedback": [
+            {
+                "feedback_text": "Loved the experience",
+                "timestamp": "2025-04-21T20:27:48.076015+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "positive",
+                    "sentiment_score": 0.7,
+                    "themes": []
+                }
+            },
+            {
+                "feedback_text": "Awfull, worst experience ive ever had",
+                "timestamp": "2025-04-21T20:30:12.449329+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "negative",
+                    "sentiment_score": -1.0,
+                    "themes": []
+                }
+            },
+            {
+                "feedback_text": "Loved the exp",
+                "timestamp": "2025-04-21T20:42:26.210183+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "positive",
+                    "sentiment_score": 0.7,
+                    "themes": []
+                }
             }
         ]
     },
@@ -47,7 +77,35 @@
                 "role": "hospitalist"
             }
         ],
-        "feedback": "I had a greate time, party, party, party"
+        "feedback": [
+            {
+                "feedback_text": "I loved Dr. Jhonson!",
+                "timestamp": "2025-04-21T20:13:01.134634+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "positive",
+                    "sentiment_score": 0.875,
+                    "themes": []
+                }
+            },
+            {
+                "feedback_text": "Worst experience ever!",
+                "timestamp": "2025-04-21T20:13:24.806556+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "negative",
+                    "sentiment_score": -1.0,
+                    "themes": []
+                }
+            },
+            {
+                "feedback_text": "Loved It!!!",
+                "timestamp": "2025-04-21T20:53:56.621298+00:00",
+                "analyzed_feedback": {
+                    "sentiment": "positive",
+                    "sentiment_score": 1.0,
+                    "themes": []
+                }
+            }
+        ]
     },
     {
         "encounter_id": "E004",
@@ -65,6 +123,7 @@
                 "name": "Dr. Owens",
                 "role": "anesthesiologist"
             }
-        ]
+        ],
+        "feedback": []
     }
 ]
