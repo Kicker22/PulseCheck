@@ -1,7 +1,3 @@
-# Import necessary modules and functions from the app package
-import sys
-import os
-
 from app.storage import load_encounters
 from app.feedback_handler import handle_feedback
 #Function to display the encounters and ask for feedback using
