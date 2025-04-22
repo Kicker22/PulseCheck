@@ -1,129 +1,90 @@
 [
     {
         "encounter_id": "E001",
+        "patient_id": "P001",
         "patient_name": "John Doe",
-        "unit": "Orthopedic Surgery",
-        "discharge_date": "2025-04-16",
+        "unit": "Cardiology",
         "providers": [
             {
-                "id": "doc001",
-                "name": "Dr. Smith",
-                "role": "surgeon"
+                "name": "Dr. Smith"
             },
             {
-                "id": "doc002",
-                "name": "Dr. Reyes",
-                "role": "anesthesiologist"
+                "name": "Nurse Kelly"
             }
         ],
-        "feedback": []
+        "discharged": true,
+        "declined": false,
+        "discharge_timestamp": "",
+        "admit_timestamp": "",
+        "feedback": {
+            "feedback_text": "Had a very long wait time and facility was dirty, dr was mean",
+            "timestamp": "2025-04-22T19:52:34.358248+00:00",
+            "analyzed_feedback": {
+                "sentiment": "negative",
+                "sentiment_score": -0.32583333333333336,
+                "themes": [
+                    "wait_time",
+                    "cleanliness"
+                ]
+            }
+        }
     },
     {
         "encounter_id": "E002",
-        "patient_name": "Jane Roe",
-        "unit": "Cardiology",
-        "discharge_date": "2025-04-15",
+        "patient_id": "P002",
+        "patient_name": "Jane Smith",
+        "unit": "Orthopedics",
         "providers": [
             {
-                "id": "doc003",
-                "name": "Dr. Patel",
-                "role": "cardiologist"
+                "name": "Dr. Reyes"
+            },
+            {
+                "name": "Nurse Lee"
             }
         ],
-        "feedback": [
-            {
-                "feedback_text": "Loved the experience",
-                "timestamp": "2025-04-21T20:27:48.076015+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "positive",
-                    "sentiment_score": 0.7,
-                    "themes": []
-                }
-            },
-            {
-                "feedback_text": "Awfull, worst experience ive ever had",
-                "timestamp": "2025-04-21T20:30:12.449329+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "negative",
-                    "sentiment_score": -1.0,
-                    "themes": []
-                }
-            },
-            {
-                "feedback_text": "Loved the exp",
-                "timestamp": "2025-04-21T20:42:26.210183+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "positive",
-                    "sentiment_score": 0.7,
-                    "themes": []
-                }
+        "discharged": false,
+        "declined": false,
+        "discharge_timestamp": "",
+        "admit_timestamp": "",
+        "feedback": {
+            "feedback_text": "",
+            "timestamp": "",
+            "analyzed_feedback": {
+                "sentiment": "",
+                "sentiment_score": 0.0,
+                "themes": []
             }
-        ]
+        }
     },
     {
         "encounter_id": "E003",
-        "patient_name": "Sam Lee",
-        "unit": "Emergency Department",
-        "discharge_date": "2025-04-17",
+        "patient_id": "P003",
+        "patient_name": "Mark Johnson",
+        "unit": "Neurology",
         "providers": [
             {
-                "id": "doc004",
-                "name": "Dr. Nguyen",
-                "role": "emergency physician"
+                "name": "Dr. Patel"
             },
             {
-                "id": "doc005",
-                "name": "Dr. Johnson",
-                "role": "hospitalist"
+                "name": "Nurse Wang"
             }
         ],
-        "feedback": [
-            {
-                "feedback_text": "I loved Dr. Jhonson!",
-                "timestamp": "2025-04-21T20:13:01.134634+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "positive",
-                    "sentiment_score": 0.875,
-                    "themes": []
-                }
-            },
-            {
-                "feedback_text": "Worst experience ever!",
-                "timestamp": "2025-04-21T20:13:24.806556+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "negative",
-                    "sentiment_score": -1.0,
-                    "themes": []
-                }
-            },
-            {
-                "feedback_text": "Loved It!!!",
-                "timestamp": "2025-04-21T20:53:56.621298+00:00",
-                "analyzed_feedback": {
-                    "sentiment": "positive",
-                    "sentiment_score": 1.0,
-                    "themes": []
-                }
+        "discharged": true,
+        "declined": false,
+        "discharge_timestamp": "",
+        "admit_timestamp": "",
+        "feedback": {
+            "feedback_text": "I had a great time, staff was nice, Dr was kinda rude, it took forever to contact office on the phone.",
+            "timestamp": "2025-04-22T19:56:55.887173+00:00",
+            "analyzed_feedback": {
+                "sentiment": "positive",
+                "sentiment_score": 0.36666666666666664,
+                "themes": [
+                    "wait_time",
+                    "staff_friendliness",
+                    "emergency_care"
+                ]
             }
-        ]
-    },
-    {
-        "encounter_id": "E004",
-        "patient_name": "Alex Kim",
-        "unit": "Gastroenterology",
-        "discharge_date": "2025-04-14",
-        "providers": [
-            {
-                "id": "doc006",
-                "name": "Dr. Santos",
-                "role": "gastroenterologist"
-            },
-            {
-                "id": "doc007",
-                "name": "Dr. Owens",
-                "role": "anesthesiologist"
-            }
-        ],
-        "feedback": []
+        }
     }
 ]

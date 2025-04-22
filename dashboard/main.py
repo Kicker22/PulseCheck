@@ -1,10 +1,8 @@
-from app.storage import load_encounters
-from app.feedback_handler import handle_feedback
+from app.cli_menu_logic import cli_menu_logic
 #Function to display the encounters and ask for feedback using
-def display_encounters(encounters):
 
-    print("--------------------------------------------------")
-    print(r"""
+print("--------------------------------------------------")
+print(r"""
     ______      _          _____ _               _
     | ___ \    | |        /  __ \ |             | |   
     | |_/ /   _| |___  ___| /  \/ |__   ___  ___| | __
@@ -14,32 +12,17 @@ def display_encounters(encounters):
                                                   
                                                 """)
     
-    print("--------------------------------------------------")
-    print("\nAvailable Encounters:")
-    print("--------------------------------------------------")
+print("--------------------------------------------------")
 
-    # Loop through the encounters and print their details
-    for e in encounters:
-        providers = ", ".join(p['name'] for p in e.get('providers', []))
-        print(f"Encounter ID: {e['encounter_id']} | Patient: {e['patient_name']} | Unit: {e['unit']} | Providers: {providers}")
 
-#Main function starts the program and handles user input
+#program entry point is in the root directory of the project 
+# file: pulsecheck.py will call this main function
+# I did this so i didn't have to specify the file pathing's in every file 
+
 def main():
-    encounters = load_encounters()
-    if not encounters:
-        print("No encounters found.")
-        return
-    display_encounters(encounters)
+    # May change name to something more descriptive in the future
+    # This function is  CLI menu logic that handles user input and calls the appropriate functions
+    # My goal is to keep things modular and organized, so I will keep the main function as is for now
+    cli_menu_logic()
 
-    encounter_id = input("\nEnter the Encounter ID you would like to provide feedback for: ").strip().upper()
-    feedback_text = input("Please provide your feedback: ").strip()
-
-    try:
-        feedback_entry = handle_feedback(encounter_id, feedback_text)
-        print(feedback_entry)
-    except ValueError as e:
-        print(f"Error: {e}")
-
-if __name__ == "__main__":
-    main()
 

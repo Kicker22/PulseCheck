@@ -9,11 +9,18 @@ def load_encounters(path=ENCOUNTER_PATH):
             with open(path, 'r') as f:
                 encounters = json.load(f)
 
-                # Ensure feedback is always a list
+                # Ensure feedback is always a dict with correct structure
                 for e in encounters:
-                    if "feedback" not in e or not isinstance(e["feedback"], list):
-                        e["feedback"] = []
-
+                    if "feedback" not in e or not isinstance(e["feedback"], dict):
+                        e["feedback"] = {
+                            "feedback_text": "",
+                            "timestamp": "",
+                            "analyzed_feedback": {
+                                "sentiment": "",
+                                "sentiment_score": 0.0,
+                                "themes": []
+                            }
+                        }
                 print(f"Loaded {len(encounters)} encounters.")
                 return encounters
 
@@ -24,13 +31,13 @@ def load_encounters(path=ENCOUNTER_PATH):
         print("File not found. Please check the path.")
         return []
 
+
 #function that accepts list for encounters and saves it to our encounters.json file
 def save_encounters(encounters, path='../data/encounters.json'):
     # Validates our list of encounters we get frmo out nlp pipline
     if isinstance(encounters, list):
         try:
             # Check if the directory exists, if not create it
-            os.makedirs(os.path.dirname(path), exist_ok=True)
             #then we save our encounters to the file
             # Open the file in write mode and save the encounters
             with open(path, 'w') as f:
