@@ -1,84 +1,58 @@
-from app.storage import load_encounters, save_encounters
+from db_config.db_test import get_connection
 from app.nlp_pipeline import analyze_feedback
 from app.killSwitch import killSwitch
-from app.analyze_feedback import analyze_feedback
-from datetime import datetime, timezone
+from db_scripts.db_utils import save_feedback_to_db
 
-from app.config import ENCOUNTER_PATH
-
-#function that prompts user to proceed or decline leaving feedback
+# Prompt user to proceed or decline
 def user_wants_to_proceed(encounter_id):
- while True:
-    confirm = input(f"Do you want to proceed with feedback for encounter {encounter_id}? (yes/no): ").strip().lower()
-    print("\n--------------------------------------------------")
-    #check user input and stop if user enters exit
-    killSwitch(confirm)
-
-    if confirm in ['yes', 'no']:
-        if confirm == 'yes':
-            return True   # Proceed
-        elif confirm == 'no':
-            return False  # Decline
-    else:   
+    while True:
+        confirm = input(f"Do you want to proceed with feedback for encounter {encounter_id}? (yes/no): ").strip().lower()
+        killSwitch(confirm)
+        if confirm in ['yes', 'no']:
+            return confirm == 'yes'
         print("Invalid input. Please enter 'yes' or 'no'.")
 
+# Handle declined feedback
+def handle_declined_feedback(encounter_id):
+    conn = get_connection()
+    cursor = conn.cursor()
 
-#function for handle declined feedback
-def handle_declined_feedback(encounter_id, path=ENCOUNTER_PATH):
-    encounters = load_encounters(path)
-    encounter = next((e for e in encounters if e['encounter_id'].upper() == encounter_id.upper()), None)
+    cursor.execute("UPDATE encounters SET declined = TRUE WHERE encounter_id = %s;", (encounter_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-    if not encounter:
-        print(f"Encounter with ID {encounter_id} not found.")
-        return
-
-    if encounter.get("declined", False):
-        print(f"Encounter {encounter_id} was already declined.")
-        return
-
-    encounter["declined"] = True
-    save_encounters(encounters, path)
     print(f"Marked encounter {encounter_id} as declined.")
 
-# This function handles the feedback from the user and processes it using the NLP pipeline.
-def handle_feedback(encounter_id, feedback_text, path=ENCOUNTER_PATH):
-
-    encounters = load_encounters(path)
-
-    # Find the matching encounter
-    encounter = next((e for e in encounters if e['encounter_id'].upper() == encounter_id.upper()), None)
-    if not encounter:
-        raise ValueError(f"Encounter with ID {encounter_id} not found.")
-
-    print("DEBUG - Type of encounter['feedback']:", type(encounter["feedback"]))
-    print("DEBUG - Value of encounter['feedback']:", encounter["feedback"])
-    # Ensure this encounter hasn't already received feedback or been declined
-    if encounter.get("declined", False):
-        raise ValueError("Feedback was declined for this encounter.")
-    if encounter["feedback"]["feedback_text"]:
-        raise ValueError("Feedback already submitted for this encounter.")
-
-    # Basic feedback quality check (optional)
-    if len(feedback_text) < 10:
-        raise ValueError("Feedback is too short. Please provide more detail.")
-
-    # Analyze the feedback
+# Handle feedback and write to DB
+def handle_feedback(encounter_id, feedback_text, providers):
+    # Analyze the text
     analysis_result = analyze_feedback(feedback_text)
-    # Fill the predefined fields
 
-    encounter["feedback"]["feedback_text"] = feedback_text
-    encounter["feedback"]["timestamp"] = datetime.now(timezone.utc).isoformat()
-    encounter["feedback"]["analyzed_feedback"]["sentiment"] = analysis_result["sentiment"]
-    encounter["feedback"]["analyzed_feedback"]["sentiment_score"] = analysis_result["sentiment_score"]
-    #save the themes in the feedback section of the encounter
-    encounter["feedback"]["analyzed_feedback"]["themes"] = analysis_result["themes"]
+    # Detect providers mentioned
+    mentioned_providers = detect_mentioned_providers(feedback_text, providers)
 
-    # Save the updated encounter
-    save_encounters(encounters, path)
+    # Combine all the feedback data
+    feedback_data = {
+        'feedback_text': feedback_text,
+        'sentiment': analysis_result['sentiment'],
+        'sentiment_score': analysis_result['sentiment_score'],
+        'themes': analysis_result['themes'],
+        'mentioned_providers': mentioned_providers
+    }
+    
 
-    print(f"Feedback for encounter {encounter_id} saved successfully.")
+    # Save feedback_data (adapt this to save in DB or JSON)
+    save_feedback_to_db(encounter_id, feedback_data)
 
-    return encounter["feedback"]  # Return just the feedback section for confirmation
+    return feedback_data
 
-
-
+# Detect mentioned providers from DB
+def detect_mentioned_providers(feedback_text, providers):
+    mentioned = []
+    text_lower = feedback_text.lower()
+    for provider in providers:
+        provider_name = provider['name'].lower()
+        if provider_name in text_lower:
+            mentioned.append(provider['name'])
+    return mentioned

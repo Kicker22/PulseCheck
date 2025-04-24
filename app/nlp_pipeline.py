@@ -1,34 +1,67 @@
-from textblob import TextBlob
+from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+import json
 
-# This is a simple NLP pipeline that performs sentiment analysis on a given text.
-# It uses the TextBlob library to analyze the sentiment and returns the polarity and subjectivity scores.
+#load thememes from json file
+
+nltk.download('vader_lexicon')
+
+sia = SentimentIntensityAnalyzer()
+with open('app/themes.json', 'r') as f:
+    theme_keywords = json.load(f)
+
+def detect_themes(text, theme_keywords):
+    matched_themes = []
+    text_lower = text.lower()
+    for theme, keywords in theme_keywords.items():
+        for keyword in keywords:
+            if keyword.lower() in text_lower:
+                matched_themes.append(theme)
+                break  # Stop after first match per theme
+    return matched_themes
+
+def detect_mentioned_providers(feedback_text, providers):
+    mentioned = []
+    text_lower = feedback_text.lower()
+    for provider in providers:
+        provider_name = provider['name'].lower()
+        if provider_name in text_lower:
+            mentioned.append(provider['name'])
+    return mentioned
+
 def analyze_feedback(text):
-    blob = TextBlob(text)
-    polarity = blob.sentiment.polarity
+    scores = sia.polarity_scores(text)
+    compound = scores['compound']  # ranges from -1.0 to +1.0
 
     sentiment = (
-        "positive" if polarity > 0 else
-        "negative" if polarity < 0 else
+        "positive" if compound > 0.05 else
+        "negative" if compound < -0.05 else
         "neutral"
     )
 
-    return{
+    themes = detect_themes(text, theme_keywords)
+
+    return {
         "sentiment": sentiment,
-        "sentiment_score": polarity,
-        "themes": [] # Placeholder for themes, to be implemented later
+        "sentiment_score": compound,
+        "themes": themes  # Themes only, no provider detection here
     }
 
-# Example usage
+
+
+# Example test
 if __name__ == "__main__":
-    text = "I love programming!"
-    result = analyze_feedback(text)
-    print(f"Sentiment: {result['sentiment']}, Score: {result['sentiment_score']}")
-    # Placeholder for themes, to be implemented later
-    print(f"Themes: {result['themes']}")
-# This code defines a simple NLP pipeline that performs sentiment analysis on a given text using the TextBlob library.
-#expected output of test case:
-    # Sentiment: positive, Score: >= 0.5
-    # Themes: []
-# The analyze_sentiment function takes a text input, creates a TextBlob object, and calculates the sentiment polarity.
-# It then categorizes the sentiment as positive, negative, or neutral based on the polarity score.
-# The function returns a dictionary containing the sentiment, sentiment score, and an empty list for themes (to be implemented later).
+    test_texts = [  
+        "Loved it, Dr. Smith was great!",
+        "This wasn't my favorite visit, Dr. Reyes was rude and dismissive.",
+        "Everything was okay.",
+        "Terrible service, but the nurse was helpful."
+    ]
+
+    for text in test_texts:
+        result = analyze_feedback(text)
+        print(f"Text: {text}")
+        print(f"Sentiment: {result['sentiment']}, Score: {result['sentiment_score']}")
+        print(f"Mentioned Providers: {result.get('mentioned_providers', [])}")
+        print(f"Themes: {result['themes']}")
+        print("----")
