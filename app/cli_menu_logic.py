@@ -1,4 +1,4 @@
-from app.feedback_handler import handle_feedback, user_wants_to_proceed, handle_declined_feedback
+from app.feedback_handler import handle_feedback, user_wants_to_proceed, mark_encounter_as_declined
 from app.killSwitch import killSwitch
 from app.display_encounters import display_encounters
 from db_scripts.db_utils import get_encounter_id_by_display_cd
@@ -40,7 +40,7 @@ def cli_menu_logic():
                         print("Feedback Summary:")
                         print(f"Feedback Entry: {feedback_entry}")
                     else:
-                        handle_declined_feedback(encounter_id)
+                        mark_encounter_as_declined(encounter_id)
                 except ValueError as e:
                     print(f"Error: {e}")
             elif choice == "2":
