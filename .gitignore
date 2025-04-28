@@ -9,6 +9,9 @@ env/
 ENV/
 .venv/
 
+.env
+
+
 # Environment variables
 .env
 *.env
