@@ -12,47 +12,67 @@ def user_wants_to_proceed(encounter_id):
             return confirm == 'yes'
         print("Invalid input. Please enter 'yes' or 'no'.")
 
-# Handle declined feedback
-def handle_declined_feedback(encounter_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("UPDATE encounters SET declined = TRUE WHERE encounter_id = %s;", (encounter_id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    print(f"Marked encounter {encounter_id} as declined.")
+# Mark an encounter as declined by the patient
+def mark_encounter_as_declined(encounter_id):
+    """
+    Sets the declined status for an encounter to TRUE in the database.
+    """
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE encounters
+                    SET declined = TRUE
+                    WHERE encounter_id = %s AND declined IS DISTINCT FROM TRUE;
+                """, (encounter_id,))
+            conn.commit()
+        print(f"Encounter {encounter_id} has been marked as declined.")
+    except Exception as e:
+        print(f"Error updating declined status for encounter {encounter_id}: {e}")
+        raise
 
 # Handle feedback and write to DB
 def handle_feedback(encounter_id, feedback_text, providers):
-    # Analyze the text
-    analysis_result = analyze_feedback(feedback_text)
+    try:
+        # Analyze the text
+        analysis_result = analyze_feedback(feedback_text)
 
-    # Detect providers mentioned
-    mentioned_providers = detect_mentioned_providers(feedback_text, providers)
+        # Detect providers mentioned
+        mentioned_providers = detect_mentioned_providers(feedback_text, providers)
 
-    # Combine all the feedback data
-    feedback_data = {
-        'feedback_text': feedback_text,
-        'sentiment': analysis_result['sentiment'],
-        'sentiment_score': analysis_result['sentiment_score'],
-        'themes': analysis_result['themes'],
-        'mentioned_providers': mentioned_providers
-    }
-    
+        # Combine all the feedback data
+        feedback_data = {
+            'feedback_text': feedback_text,
+            'sentiment': analysis_result['sentiment'],
+            'sentiment_score': analysis_result['sentiment_score'],
+            'themes': analysis_result['themes'],
+            'mentioned_providers': mentioned_providers
+        }
 
-    # Save feedback_data (adapt this to save in DB or JSON)
-    save_feedback_to_db(encounter_id, feedback_data)
+        # Save feedback_data to DB
+        save_feedback_to_db(encounter_id, feedback_data)
 
-    return feedback_data
+        return feedback_data
 
-# Detect mentioned providers from DB
+    except Exception as e:
+        print(f"Error handling feedback for encounter {encounter_id}: {e}")
+        raise
+
+# Detect providers mentioned in feedback text
 def detect_mentioned_providers(feedback_text, providers):
     mentioned = []
     text_lower = feedback_text.lower()
     for provider in providers:
-        provider_name = provider['name'].lower()
-        if provider_name in text_lower:
-            mentioned.append(provider['name'])
+        name_variants = [
+            provider['name'].lower(),
+            provider['name'].split()[0].lower(),  # First name
+            provider['name'].split()[-1].lower()  # Last name
+        ]
+        for variant in name_variants:
+            if variant in text_lower:
+                mentioned.append({
+                    'name': provider['name'],
+                    'provider_id': provider['provider_id']
+                })
+                break  # Avoid duplicates
     return mentioned
