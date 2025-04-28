@@ -1,13 +1,12 @@
 from nltk.sentiment import SentimentIntensityAnalyzer
 import nltk
 import json
-
 #load thememes from json file
 
 nltk.download('vader_lexicon')
 
 sia = SentimentIntensityAnalyzer()
-with open('app/themes.json', 'r') as f:
+with open('data/themes.json', 'r') as f:
     theme_keywords = json.load(f)
 
 def detect_themes(text, theme_keywords):
@@ -31,7 +30,7 @@ def detect_mentioned_providers(feedback_text, providers):
 
 def analyze_feedback(text):
     scores = sia.polarity_scores(text)
-    compound = scores['compound']  # ranges from -1.0 to +1.0
+    compound = scores['compound']  # -1.0 to +1.0
 
     sentiment = (
         "positive" if compound > 0.05 else
@@ -44,13 +43,14 @@ def analyze_feedback(text):
     return {
         "sentiment": sentiment,
         "sentiment_score": compound,
-        "themes": themes  # Themes only, no provider detection here
+        "themes": themes
     }
 
 
 
-# Example test
 if __name__ == "__main__":
+    providers = [{"name": "Dr. Smith"}, {"name": "Dr. Reyes"}, {"name": "Nurse Joy"}]
+
     test_texts = [  
         "Loved it, Dr. Smith was great!",
         "This wasn't my favorite visit, Dr. Reyes was rude and dismissive.",
@@ -60,8 +60,11 @@ if __name__ == "__main__":
 
     for text in test_texts:
         result = analyze_feedback(text)
+        mentioned_providers = detect_mentioned_providers(text, providers)
+        
         print(f"Text: {text}")
         print(f"Sentiment: {result['sentiment']}, Score: {result['sentiment_score']}")
-        print(f"Mentioned Providers: {result.get('mentioned_providers', [])}")
+        print(f"Mentioned Providers: {mentioned_providers}")
         print(f"Themes: {result['themes']}")
         print("----")
+

@@ -40,7 +40,8 @@ def handle_feedback(encounter_id, feedback_text, providers):
         'themes': analysis_result['themes'],
         'mentioned_providers': mentioned_providers
     }
-    
+    print("DEBUG: Mentioned Providers Raw Data:", feedback_data['mentioned_providers'])
+
 
     # Save feedback_data (adapt this to save in DB or JSON)
     save_feedback_to_db(encounter_id, feedback_data)
