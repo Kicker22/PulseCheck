@@ -1,10 +1,21 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import HTTPException
 from db_scripts.fetch_discharged_encounters import fetch_discharged_encounters
-from db_scripts.db_utils import save_feedback_to_db, fetch_providers_for_encounter, fetch_feedback_for_encounter, fetch_all_providers, fetch_theme_summary, fetch_provider_stats, fetch_feedback_for_encounter, fetch_provider_themes_summary
 from app.nlp_pipeline import analyze_feedback
 from app.feedback_handler import detect_mentioned_providers
+from db_scripts.db_utils import (
+    save_feedback_to_db, 
+    fetch_providers_for_encounter, 
+    fetch_feedback_for_encounter, 
+    fetch_all_providers, 
+    fetch_theme_summary, 
+    fetch_provider_stats, 
+    fetch_feedback_for_encounter, 
+    fetch_provider_themes_summary
+    )
+
 
 
 # Create a FastAPI app instance
@@ -12,6 +23,15 @@ app = FastAPI()
 class FeedbackSubmission(BaseModel):
     encounter_id: str
     feedback_text: str
+
+# CORS settings
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins for now; we can tighten this later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Test route to make sure it's running
 @app.get("/")
