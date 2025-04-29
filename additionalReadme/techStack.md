@@ -1,8 +1,8 @@
+# PulseCheck Tech Stack
 
-## PulseCheck Tech Stack
-PulseCheck is a real-time, scoreless, natural-language patient feedback platform built to reflect the emotional truth of care, tied directly to providers and clinical encounters.
+**PulseCheck** is a real-time, natural-language patient feedback platform designed to reflect the emotional truth of care. Feedback is attributed directly to providers and tied to clinical encounters, enabling meaningful insights for staff, and leadership.
 
-This document outlines the technology stack and architectural decisions behind the MVP version.
+This document outlines the current technology stack and architectural decisions for the MVP version.
 
 ---
 
@@ -10,75 +10,82 @@ This document outlines the technology stack and architectural decisions behind t
 
 **Python 3.10+**
 
-- Chosen for its readability, strong NLP ecosystem, and quick prototyping ability.
+- Clean syntax, fast prototyping, and strong NLP support.
+- Powers all core logic including NLP, feedback parsing, and API.
 
 ---
 
 ## NLP / Text Analysis
 
-- **TextBlob** – Basic sentiment analysis for MVP
-- **spaCy** – Named Entity Recognition (NER) to detect provider names and roles
-- **Custom Keyword-Based Theme Matching** – Loadable from `themes.json` and match key phrases for classification
-
-*Future:* swap to `transformers` or `sentence-transformers` for deeper semantic extraction and embeddings.
+| Task                  | Tool                         |
+|-----------------------|------------------------------|
+| Sentiment Analysis    | VADER (via `nltk`)           |
+| Theme Detection       | Custom keyword matcher (JSON driven) |
+| Provider Mentioning   | Lowercased substring match with name variants |
+| Future Direction      | `transformers` for deeper semantic extraction |
 
 ---
 
 ## Data Storage
 
-- **MVP**: JSON files (for simplicity and transparency)
-- **Optional MVP**: SQLite for local persistence and query capabilities
-- **Future**: PostgreSQL or other relational databases for scaling
+| Use                   | Storage Option               |
+|-----------------------|------------------------------|
+| MVP                   | PostgreSQL (via psycopg2)    |
+| Testing / Local Dev   | SQLite or JSON (fallback)    |
+| Schema                | Normalized: feedback, themes, providers, encounters |
 
 ---
 
-## Feedback Input & Visualization (Frontend)
-
-- **Streamlit** – Real-time web UI for:
-  - Entering feedback (one-text-box form)
-  - Viewing rolling feed of parsed feedback
-  - Displaying sentiment trends and top themes
-
-*Why Streamlit?* It allows rapid dashboard prototyping and interactive filters with minimal overhead.
+## API Layer
+  - fastApi
+  - See api folder for routes and comments
 
 ---
 
-## 🔍 Dashboard Features (Initial)
+## Frontend (MVP)
 
-- Live text feedback stream
-- Sentiment filters (positive, neutral, negative)
-- Top theme tagging from NLP
-- Attribution display: provider, role, unit
+**HTML + JavaScript**
+- This will probably change in the future, I've just used the simplest frontend setup for development
 
----
+- Basic static form for submitting feedback
+- Uses `fetch()` to post to FastAPI endpoints
+- Postman collection available for API testing
 
-## 🔧 Tooling / Libraries
-
-- `textblob`
-- `spacy`
-- `streamlit`
-- `pandas`
-- `pytest` (for testing)
-
-Optional additions:
-- `sentence-transformers` – For semantic clustering
-- `flask` or `fastapi` – If backend API needed later
+*Future Option*: Move to React/Vue, or dashboard tooling (e.g., Streamlit, Dash)
 
 ---
 
-## Security & Privacy (MVP Practice)
+## Tooling
 
-- Use only pseudonymized/fake data
-- No real PHI or patient identifiers
-- All feedback tied to synthetic encounter records
+| Tool / Library       | Purpose                     |
+|----------------------|-----------------------------|
+| `fastapi`            | API backend                 |
+| `uvicorn`            | ASGI server                 |
+| `nltk` + `vader`     | Sentiment scoring           |
+| `spacy` _(optional)_ | NER / phrase detection      |
+| `psycopg2`           | PostgreSQL driver           |
+| `pytest`             | Testing                     |
 
 ---
 
-## Dev Tooling
+## Security & Privacy
 
-- **Git + GitHub** – Version control
-- **pytest** – Unit testing
-- **black / isort** – Code formatting and linting (optional)
+- [`This will eventually use real clinical data of some kind or company data`]
+- Uses **synthetic data** only — no PHI or real patient identifiers
+- Feedback is pseudonymized and attributed to dummy encounter data
+- All analytics based on non-sensitive input
+- I am not using real world data for development
+---
+
+## 🛠 Dev & Deployment
+
+| Tool / Practice       | Role                        |
+|-----------------------|-----------------------------|
+| `venv` / `pip`        | Environment management      |
+| `.env`                | Credential/config separation |
+| Git + GitHub          | Version control             |
+| Postman               | API development & testing   |
+| Docker _(planned)_    | Deployment containerization |
 
 ---
 
@@ -87,11 +94,12 @@ Optional additions:
 | Component         | Tool/Lib             |
 |-------------------|----------------------|
 | Language          | Python 3.10+         |
-| Sentiment         | TextBlob             |
-| NER               | spaCy                |
+| Sentiment         | NLTK / VADER         |
 | Theme Matching    | Custom JSON matcher  |
-| Data Storage      | JSON / SQLite        |
-| Dashboard         | Streamlit            |
-| API (future)      | Flask / FastAPI      |
-| Testing           | pytest               |
+| Data Storage      | PostgreSQL / SQLite  |
+| API               | FastAPI              |
+| Frontend          | HTML + JS (MVP)      |
+| Dashboard (future)| Streamlit / React    |
+| Testing           | Pytest               |
+| Deployment (future)| Docker / Railway / EC2 |
 

@@ -1,71 +1,94 @@
+## PulseCheck: Future Roadmap
 
-#  PulseCheck: Future Roadmap
-
-These features are outside of MVP scope but reflect the long-term vision for PulseCheck as a **real-time, ethical, and transparent patient experience intelligence platform**:
+PulseCheck is evolving beyond its MVP as a real-time feedback collector toward a robust, ethical, and transparent patient experience intelligence platform. The roadmap below outlines key future features aligned with clinical value, scalability, and privacy best practices.
 
 ---
 
-##  Real-Time Triggering
-- Auto-send surveys based on simulated or real **discharge events**
+### Real-Time Feedback Triggers
+
+- Automatically send feedback requests upon patient discharge events
 - Support multiple delivery channels:
   - Email
   - SMS
-  - Patient portal (optional FHIR integration)
+  - In-app delivery via patient portal (future FHIR integration)
+- Include tracking for delivery success and response rates
 
 ---
 
-##  Advanced NLP + AI Integration
-- Swap in transformer-based models (e.g., DistilBERT, Sentence-BERT) for:
+### Advanced NLP and AI Integration
+
+- Upgrade to transformer-based models (e.g., BERT, RoBERTa) for:
   - Semantic theme clustering
-  - Emotion detection
-  - Named provider attribution with contextual safety
-- Use embeddings to group similar feedback across units or encounters
+  - Emotion detection across a broader spectrum (e.g., fear, confusion, gratitude)
+  - More accurate provider attribution with context safety checks
+- Use sentence embeddings to identify similarity across feedback by time, department, or provider
 
 ---
 
-##  Provider Experience Dashboards
-- Individualized feedback dashboards for physicians and team leads:
-  - Aggregated themes
+### Provider and Team Dashboards
+
+- Role-based dashboards for physicians, nurses, and team leads:
+  - Theme breakdowns with sentiment scores
   - Anonymized comment streams
-  - Weekly insights digest
-- Emphasis on reflection, not punishment
+  - Weekly or monthly feedback digests
+- Designed for coaching, not punishment
 
 ---
 
-##  Unit-Level and Org-Level Visualizations
-- Emotion heatmaps by department
-- Sentiment-over-time graphs
-- Theme frequency histograms
-- Real-time word clouds
+### Unit and Organization-Wide Analytics
+
+- Department-level performance visualizations:
+  - Sentiment-over-time graphs
+  - Theme frequency charts
+  - Emotion heatmaps
+  - Feedback word clouds
+- Cross-department comparison and benchmarking
 
 ---
 
-##  Automated Trend Detection
-- Flag high-risk trends:
-  - Rising mentions of pain/confusion in a specific unit
-  - Sudden drop in sentiment around a provider
-- Alert clinical leadership to emerging quality gaps
+### Automated Trend Detection and Alerts
+
+- Identify patterns that may indicate clinical or operational concerns:
+  - Spikes in negative feedback for specific units or individuals
+  - Theme surges related to confusion, wait time, or bias
+  - Drops in engagement over time
+- Auto-alerts to admin dashboards or designated email recipients
 
 ---
 
-## Export & Reporting
-- Export anonymized weekly summaries to:
-  - CSV
-  - PDF
-  - EHR inbox or BI dashboards (PowerBI, Tableau)
-- Support basic HL7 or FHIR-compatible outputs (e.g., QuestionnaireResponse)
+### Reporting and Export Capabilities
+
+- Export anonymized, filtered reports to:
+  - CSV or PDF
+  - EHR inboxes
+  - Business Intelligence tools (PowerBI, Tableau)
+- Future support for FHIR-compliant exports (e.g., QuestionnaireResponse)
 
 ---
 
-##  Privacy, Ethics & Security Enhancements
-- Token-based anonymized feedback links
-- Role-aware attribution safeguards (e.g., prevent mis-blaming)
-- Optional opt-out or patient consent flow
+### Privacy, Ethics, and Consent Handling
+
+- Tokenized, one-time-use feedback links
+- Optional opt-out or consent interface for patients
+- Safeguards to avoid accidental misattribution of feedback
+- Role-aware data visibility based on permissions
 
 ---
 
-##  OpenAPI + Integration Support
-- RESTful API layer for integrating with:
-  - EHRs
-  - Existing patient experience platforms
-  - Clinical governance tools
+### OpenAPI and Integration Support
+
+- Documented RESTful API with OpenAPI 3.0 spec
+- Integration-ready endpoints for:
+  - EHR systems (e.g., Epic, Cerner)
+  - Patient experience platforms
+  - BI tools (e.g., Tableau, Looker)
+- Support for polling, webhooks, and scheduled exports
+
+---
+
+### Stretch Goals and Long-Term Vision
+
+- Mobile-friendly admin and provider dashboards
+- Slack or Teams integration for snapshot-based alerts
+- Provider well-being and reputation scoring over time
+- In-app reflection prompts and learning tools

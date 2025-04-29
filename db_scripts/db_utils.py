@@ -216,6 +216,158 @@ def fetch_provider_themes_summary():
         print(f"Error fetching nested provider themes: {e}")
         return []
 
+def fetch_admin_summary():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT 
+                        COUNT(*) AS total_feedback,
+                        ROUND(AVG(sentiment_score), 4) AS average_sentiment,
+                        MAX(feedback_timestamp) AS most_recent_feedback
+                    FROM feedback;
+                """)
+                row = cursor.fetchone()
+
+        summary = {
+            "total_feedback": row[0],
+            "average_sentiment": float(row[1]) if row[1] is not None else 0.0,
+            "most_recent_feedback": row[2].isoformat() if row[2] else None
+        }
+
+        return summary
+
+    except Exception as e:
+        print(f"Error fetching admin summary: {e}")
+        return {
+            "total_feedback": 0,
+            "average_sentiment": 0.0,
+            "most_recent_feedback": None
+        }
+
+def fetch_theme_summary_for_admin():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT 
+                        t.theme,
+                        COUNT(*) AS count,
+                        ROUND(AVG(f.sentiment_score), 4) AS avg_sentiment
+                    FROM feedback_themes t
+                    JOIN feedback f ON t.feedback_id = f.id
+                    GROUP BY t.theme
+                    ORDER BY count DESC;
+                """)
+                rows = cursor.fetchall()
+
+        themes = []
+        for row in rows:
+            theme, count, avg_sentiment = row
+            themes.append({
+                "theme": theme,
+                "count": count,
+                "average_sentiment": float(avg_sentiment) if avg_sentiment is not None else 0.0
+            })
+
+        return themes
+
+    except Exception as e:
+        print(f"Error fetching theme summary: {e}")
+        return []
+
+def fetch_unit_performance():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT 
+                        e.unit,
+                        COUNT(f.id) AS feedback_count,
+                        ROUND(AVG(f.sentiment_score), 4) AS average_sentiment,
+                        MODE() WITHIN GROUP (ORDER BY f.sentiment) AS dominant_sentiment
+                    FROM feedback f
+                    JOIN encounters e ON f.encounter_id = e.encounter_id
+                    GROUP BY e.unit
+                    ORDER BY e.unit;
+                """)
+                rows = cursor.fetchall()
+
+        results = []
+        for row in rows:
+            unit, count, avg_sentiment, dominant_sentiment = row
+            results.append({
+                "unit": unit,
+                "feedback_count": count,
+                "average_sentiment": float(avg_sentiment) if avg_sentiment is not None else 0.0,
+                "sentiment_label": dominant_sentiment if dominant_sentiment else "neutral"
+            })
+
+        return results
+
+    except Exception as e:
+        print(f"Error fetching unit performance: {e}")
+        return []
+
+def fetch_sentiment_over_time():
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                # Fetch day-by-day sentiment data
+                cursor.execute("""
+                    SELECT 
+                        DATE(feedback_timestamp) AS feedback_date,
+                        COUNT(id) AS feedback_count,
+                        ROUND(AVG(sentiment_score), 4) AS average_sentiment
+                    FROM feedback
+                    GROUP BY feedback_date
+                    ORDER BY feedback_date;
+                """)
+                day_rows = cursor.fetchall()
+
+                # Fetch overall date range and total feedback count
+                cursor.execute("""
+                    SELECT 
+                        MIN(DATE(feedback_timestamp)) AS start_date,
+                        MAX(DATE(feedback_timestamp)) AS end_date,
+                        COUNT(id) AS total_feedback_count
+                    FROM feedback;
+                """)
+                range_row = cursor.fetchone()
+
+        # Process day-by-day results
+        days = []
+        for row in day_rows:
+            feedback_date, count, avg_sentiment = row
+            days.append({
+                "date": feedback_date.isoformat(),
+                "feedback_count": count,
+                "average_sentiment": float(avg_sentiment) if avg_sentiment is not None else 0.0
+            })
+
+        # Build final output
+        start_date, end_date, total_feedback_count = range_row
+        result = {
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None,
+            "total_feedback_count": total_feedback_count,
+            "days": days
+        }
+
+        return result
+
+    except Exception as e:
+        print(f"Error fetching sentiment over time: {e}")
+        return {
+            "start_date": None,
+            "end_date": None,
+            "total_feedback_count": 0,
+            "days": []
+        }
+
+
+
+
 
 
 def save_feedback_to_db(encounter_id, feedback_data):
