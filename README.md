@@ -2,33 +2,70 @@
 
 **Real-time, scoreless patient feedback platform tied to clinical encounters.**
 
-## MVP Features
+PulseCheck captures open-text feedback directly from patients and analyzes it for sentiment, themes, and attribution to providers and care teams. It replaces rigid survey formats with natural expression and routes insight directly to the people responsible for the care.
 
-- One-text-box patient feedback intake
-- NLP sentiment and theme analysis
-- Feedback tied to specific encounter, provider (if referenced), or unit
-- Real-time dashboard with rolling feed of insights
+---
 
 ## Why PulseCheck?
 
-- No surveys. No stars. Just organic patient expression.
-- Feedback routed to the teams actually responsible
-- Real-time visibility into patient perception of care
+- No surveys. No star ratings. Just real human feedback.
+- Routes feedback to the providers, units, or departments involved
+- Enables real-time visibility into how patients perceive care
+- Built for transparency, reflection, and clinical trust
+
+---
+
+## MVP Features (Implemented)
+
+- Free-text patient feedback intake (CLI + Web form)
+- NLP pipeline:
+  - Sentiment analysis using VADER (NLTK)
+  - Theme detection from `themes.json` via keyword matching
+  - Provider mention detection using simple name matching
+- Feedback tied to:
+  - Encounter
+  - Unit
+  - (If mentioned) Provider
+- Admin-facing API:
+  - Total feedback counts and sentiment averages
+  - Most frequent themes and sentiment breakdowns
+  - Provider performance by theme
+- Frontend:
+  - Lightweight web form using HTML + JavaScript
+  - Auto-loads encounters, submits via FastAPI
+
+---
 
 ## Example Flow
 
-1. Patient discharged
-2. PulseCheck captures open-ended feedback
-3. System analyzes tone and topic
-4. Feedback is associated with:
-   - Encounter
-   - Unit
-   - (Optional) Provider
-5. Dashboard updates live
+1. Patient is discharged from care
+2. PulseCheck sends or receives feedback
+3. The system analyzes tone, theme, and provider mentions
+4. Feedback is attributed to:
+   - A specific encounter
+   - The relevant clinical unit
+   - Any provider mentioned by name
+5. Insights are made available via API for dashboards and summaries
 
-## Future Roadmap
+---
 
-- Provider-specific dashboards
-- FHIR integration
-- Sentiment trend graphs
-- Smart alerts
+## Tech Stack
+
+| Component       | Tool / Library         |
+|-----------------|------------------------|
+| Language        | Python 3.10+           |
+| API Framework   | FastAPI                |
+| NLP             | NLTK (VADER), custom matcher |
+| Data Storage    | PostgreSQL             |
+| Frontend        | HTML + JavaScript (MVP)|
+| Testing         | Pytest                 |
+| Dev Tools       | Postman, venv, Git     |
+
+---
+
+## Getting Started
+
+### Run the API Locally
+
+```bash
+uvicorn api.api_layer:app --reload
