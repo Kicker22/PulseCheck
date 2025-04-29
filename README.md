@@ -39,7 +39,7 @@ PulseCheck captures open-text feedback directly from patients and analyzes it fo
 ## Example Flow
 
 1. Patient is discharged from care
-2. PulseCheck sends or receives feedback
+2. PulseCheck sends feedback or declines
 3. The system analyzes tone, theme, and provider mentions
 4. Feedback is attributed to:
    - A specific encounter
