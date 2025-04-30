@@ -11,7 +11,6 @@ from db_scripts.db_utils import (
     fetch_feedback_for_encounter,
     fetch_all_providers,
     fetch_theme_summary,
-    fetch_provider_stats,
     fetch_provider_themes_summary,
     fetch_admin_summary,
     fetch_theme_summary_for_admin,
@@ -51,37 +50,55 @@ def get_encounters():
 # Fetch feedback for a specific encounter
 @app.get("/getFeedback/{encounter_id}")
 def get_feedback(encounter_id: str):
-    feedback = fetch_feedback_for_encounter(encounter_id.upper())
+    feedback = fetch_feedback_for_encounter(encounter_id.lower())
     if feedback:
         return feedback
     raise HTTPException(status_code=404, detail=f"No feedback found for encounter {encounter_id}")
 
-# Submit feedback for an encounter
+from db_scripts.db_utils import fetch_all_providers
+
 @app.post("/feedback")
-def submit_feedback(feedback: FeedbackSubmission):
-    providers = fetch_providers_for_encounter(feedback.encounter_id)
-    analysis_result = analyze_feedback(feedback.feedback_text)
-    mentioned_providers = detect_mentioned_providers(feedback.feedback_text, providers)
+def submit_feedback(payload: FeedbackSubmission):
+    try:
+        # 1. NLP analysis
+        analysis = analyze_feedback(payload.feedback_text)
 
-    feedback_data = {
-        "feedback_text": feedback.feedback_text,
-        "sentiment": analysis_result["sentiment"],
-        "sentiment_score": analysis_result["sentiment_score"],
-        "themes": analysis_result["themes"],
-        "mentioned_providers": mentioned_providers,
-    }
+        # 2. Get all providers
+        all_providers = fetch_all_providers()
 
-    save_feedback_to_db(feedback.encounter_id, feedback_data)
+        # 3. NLP detection of provider mentions
+        mentioned_providers = detect_mentioned_providers(payload.feedback_text, all_providers)
 
-    return {
-        "message": f"Feedback submitted for encounter {feedback.encounter_id}",
-        "feedback_data": feedback_data,
-    }
+        # 4. Build full payload
+        feedback_data = {
+            "feedback_text": payload.feedback_text,
+            "sentiment": analysis["sentiment"],
+            "sentiment_score": analysis["sentiment_score"],
+            "themes": analysis["themes"],
+            "mentioned_providers": mentioned_providers
+        }
+
+        save_feedback_to_db(payload.encounter_id, feedback_data)
+
+        return {"message": "Feedback submitted successfully."}
+
+    except Exception as e:
+        print(f"Error in submit_feedback: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 
 # Fetch all providers
 @app.get("/providers")
 def get_providers():
     return fetch_all_providers()
+
+#Fetch providers for a specific encounter
+@app.get("/providers/{encounter_id}")
+def get_providers_for_encounter(encounter_id: str):
+    providers = fetch_providers_for_encounter(encounter_id.lower())
+    if providers:
+        return providers
+    raise HTTPException(status_code=404, detail=f"No providers found for encounter {encounter_id}")
 
 # Fetch theme summary (general)
 @app.get("/themeSummary")
@@ -92,11 +109,6 @@ def get_theme_summary():
 @app.get("/providerThemeBreakdown")
 def get_provider_theme_sentiment_details():
     return fetch_provider_themes_summary()
-
-# Fetch provider performance statistics
-@app.get("/providerStats")
-def get_provider_stats():
-    return fetch_provider_stats()
 
 # --- ADMIN ROUTES ---
 
