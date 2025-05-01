@@ -81,6 +81,42 @@ def fetch_feedback_for_encounter(encounter_id):
         print(f"Error fetching feedback for encounter {encounter_id}: {e}")
         return None
 
+def fetch_encounter_details(encounter_id):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT 
+                        e.encounter_id,
+                        e.unit,
+                        e.encounter_display_cd,
+                        e.admission_timestamp,
+                        e.discharge_timestamp,
+                        ARRAY_AGG(DISTINCT p.name) AS provider_names
+                    FROM encounters e
+                    LEFT JOIN encounter_providers ep ON e.encounter_id = ep.encounter_id
+                    LEFT JOIN providers p ON ep.provider_id = p.provider_id
+                    WHERE e.encounter_id = %s
+                    GROUP BY e.encounter_id, e.unit, e.encounter_display_cd, e.admission_timestamp, e.discharge_timestamp;
+                """, (encounter_id,))
+                row = cursor.fetchone()
+
+        if row:
+            return {
+                "encounter_id": row[0],
+                "unit": row[1],
+                "encounter_display_cd": row[2],
+                "admission_timestamp": row[3],
+                "discharge_timestamp": row[4],
+                "providers": row[5]
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error fetching encounter details for {encounter_id}: {e}")
+        return None
+
 
 def fetch_all_providers():
     try:

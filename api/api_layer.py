@@ -1,6 +1,10 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import jwt
+from jwt import ExpiredSignatureError, InvalidTokenError
+from utils.token_utils import SECRET_KEY, ALGORITHM
 
 from db_scripts.fetch_discharged_encounters import fetch_discharged_encounters
 from app.nlp_pipeline import analyze_feedback
@@ -15,7 +19,9 @@ from db_scripts.db_utils import (
     fetch_admin_summary,
     fetch_theme_summary_for_admin,
     fetch_unit_performance,
-    fetch_sentiment_over_time
+    fetch_sentiment_over_time,
+    fetch_all_providers,
+    fetch_encounter_details
 )
 
 # Initialize FastAPI app
@@ -34,6 +40,10 @@ app.add_middleware(
 class FeedbackSubmission(BaseModel):
     encounter_id: str
     feedback_text: str
+
+
+# Serve everything inside /frontend as static
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 # --- ROUTES ---
 
@@ -55,8 +65,40 @@ def get_feedback(encounter_id: str):
         return feedback
     raise HTTPException(status_code=404, detail=f"No feedback found for encounter {encounter_id}")
 
-from db_scripts.db_utils import fetch_all_providers
+# Fetch encounter details for a specific encounter
+@app.get("/encounter/{encounter_id}")
+def get_encounter(encounter_id: str):
+    encounter = fetch_encounter_details(encounter_id)
+    if not encounter:
+        raise HTTPException(status_code=404, detail="Encounter not found")
+    return encounter
 
+@app.get("/validateToken")
+def validate_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return { "encounter_id": payload["encounter_id"] }
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+@app.get("/feedback")
+def view_feedback_form(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        encounter_id = payload["encounter_id"]
+
+        return {
+            "message": "Valid token",
+            "encounter_id": encounter_id
+        }
+
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
 @app.post("/feedback")
 def submit_feedback(payload: FeedbackSubmission):
     try:
