@@ -7,22 +7,15 @@
 <body>
   <h1>PulseCheck - Patient Feedback</h1>
 
-  <div id="encounter-list">
-    <!-- Insert encounter relevant to who is logged in and if its a recent encounter -->
-     <!-- This will be the last encounter they had -->
-
-    <h2>Your Recent Visit</h2>
-    <div id="encounter-details">
-      <!-- Encounter details will be dynamically inserted here -->
-
-  </div>
+  <div id="encounter-details"></div>
 
   <div id="feedback-form" style="margin-top: 20px;">
     <h2>Write Your Feedback</h2>
     <textarea id="feedback-text" rows="5" cols="50" placeholder="Enter your feedback..."></textarea><br><br>
-    <button onclick="submitFeedback()">Submit Feedback</button>
+    <button id="submit-feedback" disabled>Submit Feedback</button>
   </div>
 
-  <script src="./js/fetchEncounters.js"></script>
+  <script src="/static/js/feedback.js"></script>
+
 </body>
 </html>
